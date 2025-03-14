@@ -15,22 +15,14 @@ jobs:
 
       - name: Run Zee Script
         run: |
+          for zee in "VERSION_FILE=CURRENT_VERSION" \
+            "JSON_FILE=$REPO/${REPO_TYPE}.json" "TAG_NAME=$(date +'%Y%m%d')" \
+            "RELEASE_FILE=$(basename ${{ github.repository }})-monet-og.zip"; do
+                echo "$zee" >> $GITHUB_ENV
+          done
+          
           chmod +x zee.sh
           ./zee.sh
-          
-          AUTHOR='MasterZeeno'
-          ALIAS="zee"
-          REPO="${ALIAS}-yt"
-          REPO_TYPE="monet-og"
-          VERSION_FILE="CURRENT_VERSION"
-          JSON_FILE="$REPO/${REPO_TYPE}.json"
-          RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
-          TAG_NAME=$(date +'%Y%m%d')
-          
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-          echo "VERSION_FILE=${VERSION_FILE}" >> $GITHUB_ENV
-          echo "JSON_FILE=${JSON_FILE}" >> $GITHUB_ENV
-          echo "RELEASE_FILE=${RELEASE_FILE}" >> $GITHUB_ENV
           
       - name: Verify File for Release
         run: |
