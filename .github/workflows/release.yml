@@ -20,18 +20,9 @@ jobs:
           chmod +x zee.sh
           ./zee.sh
           env >> $GITHUB_ENV
-          
-      - name: Commit and Push CURRENT_VERSION Changes
-        if: env.HAS_RELEASE_FILE == '1'
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILE}}
-          git commit -m "Auto-update"
-          git push origin main
-
+      
       - name: Create GitHub Release
-        if: env.HAS_RELEASE_FILE == '1'
+        if: env.HAS_RELEASE_FILE == 'true'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.RELEASE_FILE }}
@@ -40,3 +31,13 @@ jobs:
           body: "Automatically generated release from GitHub Actions."
           draft: false
           prerelease: false
+          
+      - name: Commit and Push Changes
+        if: env.HAS_RELEASE_FILE == 'true'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILE}}
+          git commit -m "Auto-update"
+          git push origin main
+          

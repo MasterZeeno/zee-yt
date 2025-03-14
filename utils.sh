@@ -15,7 +15,7 @@ VERSION_FILE="$MODDIR/CURRENT_VERSION"
 JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
 RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
 TAG_NAME=$(date +'%Y%m%d')
-HAS_RELEASE_FILE=0
+HAS_RELEASE_FILE=false
 LATEST_VERSION=
 VERSION_CODE=
 JSON_DATA=
@@ -227,7 +227,7 @@ edit_module() {
         zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
-        HAS_RELEASE_FILE=1
+        HAS_RELEASE_FILE=true
     fi
 }
 
