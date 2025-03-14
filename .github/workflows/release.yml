@@ -18,35 +18,21 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full history for detecting changes
 
-      - name: Save Initial File List and Hash
-        run: |
-          ls -1 > initial_files.txt
-          if [ -f CURRENT_VERSION ]; then
-            sha256sum CURRENT_VERSION > current_version_before.txt
-          fi
-
       - name: Run Zee Script
         run: |
           chmod +x zee.sh
           ./zee.sh
-
-      - name: Detect New Files
+          
+      - name: Verify Files for Release
         run: |
-          ls -1 > after_files.txt
-          NEW_FILES=$(comm -13 <(sort initial_files.txt) <(sort after_files.txt) | tr '\n' ' ')
-          echo "NEW_FILES=${NEW_FILES}" >> $GITHUB_ENV
-
-      - name: Check for Changes in CURRENT_VERSION
-        run: |
-          if [ -f CURRENT_VERSION ]; then
-            sha256sum CURRENT_VERSION > current_version_after.txt
-            if ! diff -q current_version_before.txt current_version_after.txt > /dev/null; then
-              echo "CURRENT_VERSION_MODIFIED=true" >> $GITHUB_ENV
-            fi
+          RELEASE_FILE=""
+          if [ -f "ZEE-YT-monet-og.zip" ]; then
+            RELEASE_FILE="ZEE-YT-monet-og.zip"
           fi
-
+          echo "RELEASE_FILE=${RELEASE_FILE}" >> $GITHUB_ENV
+          
       - name: Commit and Push CURRENT_VERSION Changes
-        if: env.CURRENT_VERSION_MODIFIED == 'true'
+        if: env.RELEASE_FILE != ''
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
@@ -55,28 +41,16 @@ jobs:
           git push origin main
 
       - name: Generate Tag Name
+        if: env.RELEASE_FILE != ''
         run: echo "TAG_NAME=release-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
-      - name: Verify Files for Release
-        run: |
-          FILES="CURRENT_VERSION ZEE-YT-monet-og.zip utils.sh zee-yt zee.sh"
-          RELEASE_FILES=""
-          for FILE in $FILES; do
-            if [ -e "$FILE" ]; then
-              RELEASE_FILES="$RELEASE_FILES $FILE"
-            else
-              echo "Skipping missing file: $FILE"
-            fi
-          done
-          echo "RELEASE_FILES=${RELEASE_FILES}" >> $GITHUB_ENV
-
       - name: Create GitHub Release
-        if: env.NEW_FILES != ''
+        if: env.RELEASE_FILE != ''
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.RELEASE_FILES }}
+          files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
-          name: "New Auto Release"
+          name: "ZEE-YT-monet-og.zip"
           body: "Automatically generated release from GitHub Actions."
           draft: false
           prerelease: false
