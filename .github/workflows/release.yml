@@ -1,4 +1,4 @@
-name: Run Zee Script and Release New Files
+name: Update
 
 on:
   schedule:
