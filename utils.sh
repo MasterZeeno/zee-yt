@@ -114,7 +114,6 @@ needs_update() {
 
 download_and_extract() {
     [ -d "$TEMPORARY_DIR" ] || mkdir -p "$TEMPORARY_DIR" || { show_msg "Error: No permissions to create '$TEMPORARY_DIR'."; return 1; }
-    rm -rf "$TEMPORARY_DIR"/*
     
     ZIP_URL=$(get_latest_info zipUrl)
     [ -z "$ZIP_URL" ] && { show_msg "Error: No valid download URL found."; return 1; }
@@ -223,7 +222,6 @@ edit_module() {
         zip -r "$ZIP_NAME" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$ZIP_NAME" "$MODDIR/$ZIP_NAME"
-        rm -rf "$TEMPORARY_DIR"
     fi
 }
 
