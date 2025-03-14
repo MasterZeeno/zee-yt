@@ -2,17 +2,23 @@
 
 MODDIR=${0%/*}
 AUTHOR='MasterZeeno'
-ALIAS='ZEE'
-REPO="${ALIAS}-YT"
+ALIAS='zee'
+REPO="${ALIAS}-yt"
 REPO_TYPE="${1:-monet-og}"
-SITE="https://raw.githubusercontent.com"
+HTTPS="https://"
+SITE="${HTTPS}raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/$REPO_TYPE.json"
 TEMPORARY_DIR="$MODDIR/tmp"
 VERSION_FILE="$MODDIR/CURRENT_VERSION"
+JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
+RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+HAS_RELEASE_FILE=0
+TAG_NAME=$(date +'%Y%m%d')
 LATEST_VERSION=
+VERSION_CODE=
 JSON_DATA=
 
 check_dependencies() {
@@ -89,6 +95,7 @@ get_latest_info() {
 
 needs_update() {
     LATEST_VERSION=$(prepend_v "$(get_latest_info)") || exit 1
+    VERSION_CODE=$(get_latest_info versionCode) || exit 1
 
     # Extract version components
     CURRENT_MAJOR=$(get_field "$CURRENT_VERSION" 1); CURRENT_MINOR=$(get_field "$CURRENT_VERSION" 2); CURRENT_PATCH=$(get_field "$CURRENT_VERSION" 3)
@@ -118,10 +125,10 @@ download_and_extract() {
     ZIP_URL=$(get_latest_info zipUrl)
     [ -z "$ZIP_URL" ] && { show_msg "Error: No valid download URL found."; return 1; }
 
-    ZIP_NAME="${ZIP_URL##*/}"
-    ZIP_FILE="$TEMPORARY_DIR/$ZIP_NAME"
+    RELEASE_FILE="${ZIP_URL##*/}"
+    ZIP_FILE="$TEMPORARY_DIR/$RELEASE_FILE"
 
-    show_msg "Downloading: $ZIP_NAME ($LATEST_VERSION)..." 1
+    show_msg "Downloading: $RELEASE_FILE ($LATEST_VERSION)..." 1
 
     for i in 1 2 3; do
         curl -L --progress-bar -o "$ZIP_FILE" "$ZIP_URL" && break
@@ -152,7 +159,8 @@ edit_module() {
     
         MOD_PROP="$TEMPORARY_DIR/module.prop"
         CONFIG_FILE="$TEMPORARY_DIR/config"
-
+        
+        PATH_NAME="$(toupper "$ALIAS")PATH"
         TO_MATCH='VERSION='
         TO_APPEND='VERSION=$(PREPEND_V "$VERSION")'
         TO_DELETE='Join t.me'
@@ -170,8 +178,8 @@ edit_module() {
                 NEW_CONTENTS=$(echo "$CONTENTS" | sed -e "/.*${TO_DELETE}.*/d" \
                                                       -e "s|rvhc|$REPO|g" \
                                                       -e "s|${APK_PATH}|${NEW_APK_PATH}|g" \
-                                                      -e "s|RVPATH=.*|${ALIAS}PATH=/data/adb/$REPO/${ALIAS}.apk|g" \
-                                                      -e "s|RVPATH|${ALIAS}PATH|g")
+                                                      -e "s|RVPATH=.*|$PATH_NAME=/data/adb/$REPO/${ALIAS}.apk|g" \
+                                                      -e "s|RVPATH|$PATH_NAME|g")
         
                 if [ "$NEW_CONTENTS" != "$CONTENTS" ]; then
                     CONTENTS="$NEW_CONTENTS"
@@ -218,16 +226,32 @@ edit_module() {
         fi
         
         cd "$TEMPORARY_DIR"
-        ZIP_NAME="${REPO}-${REPO_TYPE}.zip"
-        zip -r "$ZIP_NAME" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
+        zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
-        mv -f "$TEMPORARY_DIR/$ZIP_NAME" "$MODDIR/$ZIP_NAME"
+        mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
+        HAS_RELEASE_FILE=1
     fi
+}
+
+edit_json() {
+    CONTENTS=$(cat "$JSON_FILE")
+    for item in "version=$LATEST_VERSION" "versionCode=$VERSION_CODE" \
+    "zipUrl=${HTTPS}github.com/$AUTHOR/$REPO/releases/download/$TAG_NAME/$RELEASE_FILE"; do
+        search="${item%=*}"
+        replace="${item##*=}"
+        if ! echo "$CONTENTS" | grep -qF "$item"; then
+            CONTENTS=$(echo "$CONTENTS" | sed "s|.*${search}: .*|${search}: $replace|")
+            show_msg "Success: '$item' - edited."
+        else
+            show_msg "Skipping: '$item' - already edited."
+        fi
+    done
 }
 
 update() {
     if ! needs_update; then
         download_and_extract
         edit_module
+        edit_json
     fi
 }
