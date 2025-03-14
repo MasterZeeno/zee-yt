@@ -88,8 +88,7 @@ get_latest_info() {
     if [ -z "$JSON_DATA" ]; then
         JSON_DATA=$(curl -fsSL "$ORIG_JSON_URL") || return 1
     fi
-    VALUE=$(echo "$JSON_DATA" | awk -F'"' "/\"$INFO_TYPE\":/ { print \$4 }")
-    [ -n "$VALUE" ] && echo "$VALUE" || { show_msg "Error: Unable to retrieve $INFO_TYPE."; return 1; }
+    echo "$JSON_DATA" | jq -r ".$INFO_TYPE" || { show_msg "Error: Unable to retrieve $INFO_TYPE."; return 1; }
 }
 
 needs_update() {
@@ -124,7 +123,6 @@ download_and_extract() {
     ZIP_URL=$(get_latest_info zipUrl)
     [ -z "$ZIP_URL" ] && { show_msg "Error: No valid download URL found."; return 1; }
 
-    # RELEASE_FILE="${ZIP_URL##*/}"
     ZIP_FILE="$TEMPORARY_DIR/$RELEASE_FILE"
 
     show_msg "Downloading: $RELEASE_FILE ($LATEST_VERSION)..." 1
