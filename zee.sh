@@ -8,3 +8,5 @@ CURRENT_VERSION=$(cat "$VERSION_FILE")
 
 check_dependencies curl unzip || exit 1
 update
+
+exit 0
