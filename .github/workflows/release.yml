@@ -20,7 +20,15 @@ jobs:
           chmod +x zee.sh
           ./zee.sh
           env >> $GITHUB_ENV
-      
+          
+      - name: Verify File for Release
+        run: |
+          if [ -f ${{ env.RELEASE_FILE }} ]; then
+            echo "HAS_RELEASE_FILE=true" >> $GITHUB_ENV
+          else
+            echo "HAS_RELEASE_FILE=false" >> $GITHUB_ENV
+          fi
+          
       - name: Create GitHub Release
         if: env.HAS_RELEASE_FILE == 'true'
         uses: softprops/action-gh-release@v2

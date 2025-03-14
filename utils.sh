@@ -124,7 +124,7 @@ download_and_extract() {
     ZIP_URL=$(get_latest_info zipUrl)
     [ -z "$ZIP_URL" ] && { show_msg "Error: No valid download URL found."; return 1; }
 
-    RELEASE_FILE="${ZIP_URL##*/}"
+    # RELEASE_FILE="${ZIP_URL##*/}"
     ZIP_FILE="$TEMPORARY_DIR/$RELEASE_FILE"
 
     show_msg "Downloading: $RELEASE_FILE ($LATEST_VERSION)..." 1
