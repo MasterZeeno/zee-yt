@@ -195,6 +195,7 @@ edit_module() {
         if [ -s "$CONFIG_FILE" ]; then
             CONTENTS=$(cat "$CONFIG_FILE")
             if [ -s "$CONFIG_FILE" ]; then
+                sed -e "s|^PKG_VER=.*|PKG_VER=$LATEST_VERSION|" "$CONFIG_FILE"
                 CONFIG_FX="PREPEND_V() { case \"\$1\" in v*) echo \"\$1\" ;; *) echo \"v\$1\" ;; esac; }"
                 if ! echo "$CONTENTS" | grep -qF "$CONFIG_FX"; then
                     echo "$CONFIG_FX" >> "$CONFIG_FILE"
