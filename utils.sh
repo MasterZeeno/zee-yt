@@ -12,11 +12,13 @@ ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/$REPO_TYPE.json"
 TEMPORARY_DIR="$MODDIR/tmp"
-VERSION_FILE="$MODDIR/CURRENT_VERSION"
-JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
-RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
-HAS_RELEASE_FILE=0
-TAG_NAME=$(date +'%Y%m%d')
+
+export VERSION_FILE="$MODDIR/CURRENT_VERSION"
+export JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
+export RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+export HAS_RELEASE_FILE=0
+export TAG_NAME=$(date +'%Y%m%d')
+
 LATEST_VERSION=
 VERSION_CODE=
 JSON_DATA=
@@ -229,7 +231,7 @@ edit_module() {
         zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
-        HAS_RELEASE_FILE=1
+        export HAS_RELEASE_FILE=1
     fi
 }
 

@@ -37,7 +37,7 @@ jobs:
         if: env.HAS_RELEASE_FILE == '1'
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.TAGNAME }}
+          files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
           name: "ZEE-YT-monet-og.zip"
           body: "Automatically generated release from GitHub Actions."
