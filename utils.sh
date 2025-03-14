@@ -249,6 +249,6 @@ update() {
     if ! needs_update; then
         download_and_extract
         edit_module
-        edit_json
+        # edit_json
     fi
 }
