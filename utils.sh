@@ -93,7 +93,7 @@ get_latest_info() {
 
 needs_update() {
     LATEST_VERSION=$(prepend_v "$(get_latest_info)") || exit 1
-    VERSION_CODE=$(get_latest_info versionCode)
+    VERSION_CODE=$(get_latest_info versionCode) || exit 1
 
     # Extract version components
     CURRENT_MAJOR=$(get_field "$CURRENT_VERSION" 1); CURRENT_MINOR=$(get_field "$CURRENT_VERSION" 2); CURRENT_PATCH=$(get_field "$CURRENT_VERSION" 3)
@@ -120,7 +120,7 @@ needs_update() {
 download_and_extract() {
     [ -d "$TEMPORARY_DIR" ] || mkdir -p "$TEMPORARY_DIR" || { show_msg "Error: No permissions to create '$TEMPORARY_DIR'."; return 1; }
     
-    ZIP_URL=$(get_latest_info zipUrl)
+    ZIP_URL=$(get_latest_info zipUrl) || exit 1
     [ -z "$ZIP_URL" ] && { show_msg "Error: No valid download URL found."; return 1; }
 
     ZIP_FILE="$TEMPORARY_DIR/$RELEASE_FILE"
@@ -161,7 +161,7 @@ edit_module() {
         TO_APPEND='VERSION=$(PREPEND_V "$VERSION")'
         TO_DELETE='Join t.me'
         
-        for file in customize service; do
+        for file in customize service uninstall; do
             file="$TEMPORARY_DIR/${file}.sh"
             if [ -s "$file" ]; then
                 CONTENTS=$(cat "$file")
@@ -174,6 +174,7 @@ edit_module() {
                 NEW_CONTENTS=$(echo "$CONTENTS" | sed -e "/.*${TO_DELETE}.*/d" \
                                                       -e "s|rvhc|$REPO|g" \
                                                       -e "s|${APK_PATH}|${NEW_APK_PATH}|g" \
+                                                      -e "s|/data/adb/.*.apk|/data/adb/$REPO/${ALIAS}.apk|g" \
                                                       -e "s|RVPATH=.*|$PATH_NAME=/data/adb/$REPO/${ALIAS}.apk|g" \
                                                       -e "s|RVPATH|$PATH_NAME|g")
         
@@ -225,24 +226,31 @@ edit_module() {
         zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
+        rm -rf "$TEMPORARY_DIR"
         HAS_RELEASE_FILE=true
     fi
 }
 
 edit_json() {
-    CONTENTS=$(cat "$JSON_FILE")
-    for item in "version=$LATEST_VERSION" "versionCode=$VERSION_CODE" \
-    "zipUrl=https://github.com/$AUTHOR/$REPO/releases/download/$TAG_NAME/$RELEASE_FILE"; do
-        search="${item%=*}"
-        replace="${item##*=}"
-        if ! echo "$CONTENTS" | grep -qF "$item"; then
-            CONTENTS=$(echo "$CONTENTS" | sed "s|.*${search}: .*|${search}: $replace|")
-            show_msg "Success: '$item' - edited."
-        else
-            show_msg "Skipping: '$item' - already edited."
-        fi
-    done
-    update_version "$LATEST_VERSION"
+    if [ ! -f "$JSON_FILE" ]; then
+        show_msg "Error: $JSON_FILE not found!"
+        return 1
+    fi
+
+    # Run jq safely
+    jq --arg version "$LATEST_VERSION" \
+       --argjson versionCode "$VERSION_CODE" \
+       --arg zipUrl "https://github.com/$AUTHOR/$REPO/releases/download/$TAG_NAME/$RELEASE_FILE" \
+       '.version = $version | .versionCode = $versionCode | .zipUrl = $zipUrl' \
+       "$JSON_FILE" > "${JSON_FILE}.tmp" && mv "${JSON_FILE}.tmp" "$JSON_FILE"
+
+    if [ $? -eq 0 ]; then
+        show_msg "Success: Updated JSON file."
+        update_version "$LATEST_VERSION"
+    else
+        show_msg "Error: Failed to update JSON file."
+        return 1
+    fi
 }
 
 update() {

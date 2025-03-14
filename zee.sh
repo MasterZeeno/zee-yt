@@ -6,5 +6,5 @@ MODDIR=${0%/*}
 [ -f "$VERSION_FILE" ] || update_version "0.0.0"
 CURRENT_VERSION=$(cat "$VERSION_FILE")
 
-# check_dependencies curl unzip || exit 1
+check_dependencies curl unzip jq || exit 1
 update

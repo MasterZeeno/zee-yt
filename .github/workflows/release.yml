@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full history for detecting changes
 
       - name: Run Zee Script
         run: |
@@ -23,11 +21,20 @@ jobs:
           
       - name: Verify File for Release
         run: |
-          if [ -f ${{ env.RELEASE_FILE }} ]; then
+          if [ -f "${{ env.RELEASE_FILE }}" ]; then
             echo "HAS_RELEASE_FILE=true" >> $GITHUB_ENV
           else
             echo "HAS_RELEASE_FILE=false" >> $GITHUB_ENV
           fi
+      
+      - name: Commit and Push Changes
+        if: env.HAS_RELEASE_FILE == 'true'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILE}}
+          git commit -m "Auto-update"
+          git push origin main
           
       - name: Create GitHub Release
         if: env.HAS_RELEASE_FILE == 'true'
@@ -39,13 +46,4 @@ jobs:
           body: "Automatically generated release from GitHub Actions."
           draft: false
           prerelease: false
-          
-      - name: Commit and Push Changes
-        if: env.HAS_RELEASE_FILE == 'true'
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILE}}
-          git commit -m "Auto-update"
-          git push origin main
           
