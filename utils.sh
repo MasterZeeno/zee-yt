@@ -2,19 +2,20 @@
 
 MODDIR=${0%/*}
 AUTHOR='MasterZeeno'
-ALIAS='zee'
+ALIAS="zee"
 REPO="${ALIAS}-yt"
-REPO_TYPE='monet-og'
+REPO_TYPE="monet-og"
 SITE="https://raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
-ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/$REPO_TYPE.json"
+ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
 TEMPORARY_DIR="$MODDIR/tmp"
 VERSION_FILE="$MODDIR/CURRENT_VERSION"
 JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
 RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
 TAG_NAME=$(date +'%Y%m%d')
+HAS_RELEASE_FILE=0
 LATEST_VERSION=
 VERSION_CODE=
 JSON_DATA=
@@ -73,7 +74,7 @@ prepend_v() {
 }
 
 update_version() {
-    content=$(prepend_v "${1:-$LATEST_VERSION}")
+    content=$(prepend_v "$1")
     echo "$content" > "$VERSION_FILE"
 }
 
@@ -93,7 +94,7 @@ get_latest_info() {
 
 needs_update() {
     LATEST_VERSION=$(prepend_v "$(get_latest_info)") || exit 1
-    VERSION_CODE=$(get_latest_info versionCode) || exit 1
+    VERSION_CODE=$(get_latest_info versionCode)
 
     # Extract version components
     CURRENT_MAJOR=$(get_field "$CURRENT_VERSION" 1); CURRENT_MINOR=$(get_field "$CURRENT_VERSION" 2); CURRENT_PATCH=$(get_field "$CURRENT_VERSION" 3)
@@ -140,7 +141,6 @@ download_and_extract() {
     if unzip -o "$ZIP_FILE" -d "$TEMPORARY_DIR" > /dev/null; then
         rm -f "$ZIP_FILE"
         show_msg "Download and extraction completed successfully."
-        update_version
     else
         show_msg "Error: Failed to unzip '$ZIP_FILE'."
         return 1
@@ -227,6 +227,7 @@ edit_module() {
         zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
+        HAS_RELEASE_FILE=1
     fi
 }
 
@@ -243,12 +244,13 @@ edit_json() {
             show_msg "Skipping: '$item' - already edited."
         fi
     done
+    update_version "$LATEST_VERSION"
 }
 
 update() {
     if ! needs_update; then
         download_and_extract
         edit_module
-        # edit_json
+        edit_json
     fi
 }
