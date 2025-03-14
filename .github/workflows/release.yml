@@ -15,8 +15,13 @@ jobs:
 
       - name: Run Zee Script
         run: |
-          chmod +x zee.sh
-          ./zee.sh
+          source utils.sh
+          
+          CURRENT_VERSION=$(cat "$VERSION_FILE")
+
+          check_dependencies curl unzip jq
+          update
+          
           env >> $GITHUB_ENV
           
       - name: Verify File for Release
