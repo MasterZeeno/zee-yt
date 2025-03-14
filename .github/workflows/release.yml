@@ -15,8 +15,9 @@ jobs:
 
       - name: Run Zee Script
         run: |
-          for zee in "VERSION_FILE=CURRENT_VERSION" \
-            "JSON_FILE=$REPO/${REPO_TYPE}.json" "TAG_NAME=$(date +'%Y%m%d')" \
+          for zee in "TAG_NAME=$(date +'%Y%m%d')" \
+            "VERSION_FILE=CURRENT_VERSION" \
+            "JSON_FILE=$(basename ${{ github.repository }})/monet-og.json" \
             "RELEASE_FILE=$(basename ${{ github.repository }})-monet-og.zip"; do
                 echo "$zee" >> $GITHUB_ENV
           done
