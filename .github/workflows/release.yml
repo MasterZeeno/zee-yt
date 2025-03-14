@@ -15,16 +15,22 @@ jobs:
 
       - name: Run Zee Script
         run: |
-          MODDIR=${0%/*}
-          . "$MODDIR/utils.sh"
+          chmod +x zee.sh
+          ./zee.sh
           
-          [ -f "$VERSION_FILE" ] || update_version "0.0.0"
-          CURRENT_VERSION=$(cat "$VERSION_FILE")
-
-          check_dependencies curl unzip jq
-          update
+          AUTHOR='MasterZeeno'
+          ALIAS="zee"
+          REPO="${ALIAS}-yt"
+          REPO_TYPE="monet-og"
+          VERSION_FILE="CURRENT_VERSION"
+          JSON_FILE="$REPO/${REPO_TYPE}.json"
+          RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+          TAG_NAME=$(date +'%Y%m%d')
           
-          env >> $GITHUB_ENV
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "VERSION_FILE=${VERSION_FILE}" >> $GITHUB_ENV
+          echo "JSON_FILE=${JSON_FILE}" >> $GITHUB_ENV
+          echo "RELEASE_FILE=${RELEASE_FILE}" >> $GITHUB_ENV
           
       - name: Verify File for Release
         run: |
