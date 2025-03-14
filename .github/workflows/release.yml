@@ -15,7 +15,7 @@ jobs:
 
       - name: Run Zee Script
         run: |
-          source utils.sh
+          source ./utils.sh
           
           CURRENT_VERSION=$(cat "$VERSION_FILE")
 
