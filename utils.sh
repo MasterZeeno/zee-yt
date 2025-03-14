@@ -193,17 +193,15 @@ edit_module() {
         done
         
         if [ -s "$CONFIG_FILE" ]; then
-            CONTENTS=$(cat "$CONFIG_FILE")
-            if [ -s "$CONFIG_FILE" ]; then
-                sed -e "s|^PKG_VER=.*|PKG_VER=$LATEST_VERSION|" "$CONFIG_FILE"
-                CONFIG_FX="PREPEND_V() { case \"\$1\" in v*) echo \"\$1\" ;; *) echo \"v\$1\" ;; esac; }"
-                if ! echo "$CONTENTS" | grep -qF "$CONFIG_FX"; then
-                    echo "$CONFIG_FX" >> "$CONFIG_FILE"
-                    show_msg "Success: '$CONFIG_FILE' - edited."
-                else
-                    show_msg "Skipping: '$CONFIG_FILE' - already edited."
-                fi
+            CONTENTS=$(cat "$CONFIG_FILE" | sed "s|^PKG_VER=.*|PKG_VER=$LATEST_VERSION|")
+            CONFIG_FX="PREPEND_V() { case \"\$1\" in v*) echo \"\$1\" ;; *) echo \"v\$1\" ;; esac; }"
+            if ! echo "$CONTENTS" | grep -qF "$CONFIG_FX"; then
+                CONTENTS="$CONTENTS\n$CONFIG_FX"
+                show_msg "Success: '$CONFIG_FILE' - edited."
+            else
+                show_msg "Skipping: '$CONFIG_FILE' - already edited."
             fi
+            echo "$CONTENTS" > "$CONFIG_FILE"
         fi
         
         if [ -s "$MOD_PROP" ]; then
