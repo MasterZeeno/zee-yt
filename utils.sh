@@ -4,21 +4,17 @@ MODDIR=${0%/*}
 AUTHOR='MasterZeeno'
 ALIAS='zee'
 REPO="${ALIAS}-yt"
-REPO_TYPE="${1:-monet-og}"
-HTTPS="https://"
-SITE="${HTTPS}raw.githubusercontent.com"
+REPO_TYPE='monet-og'
+SITE="https://raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/$REPO_TYPE.json"
 TEMPORARY_DIR="$MODDIR/tmp"
-
-export VERSION_FILE="$MODDIR/CURRENT_VERSION"
-export JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
-export RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
-export HAS_RELEASE_FILE=0
-export TAG_NAME=$(date +'%Y%m%d')
-
+VERSION_FILE="$MODDIR/CURRENT_VERSION"
+JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
+RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+TAG_NAME=$(date +'%Y%m%d')
 LATEST_VERSION=
 VERSION_CODE=
 JSON_DATA=
@@ -231,14 +227,13 @@ edit_module() {
         zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
-        export HAS_RELEASE_FILE=1
     fi
 }
 
 edit_json() {
     CONTENTS=$(cat "$JSON_FILE")
     for item in "version=$LATEST_VERSION" "versionCode=$VERSION_CODE" \
-    "zipUrl=${HTTPS}github.com/$AUTHOR/$REPO/releases/download/$TAG_NAME/$RELEASE_FILE"; do
+    "zipUrl=https://github.com/$AUTHOR/$REPO/releases/download/$TAG_NAME/$RELEASE_FILE"; do
         search="${item%=*}"
         replace="${item##*=}"
         if ! echo "$CONTENTS" | grep -qF "$item"; then
