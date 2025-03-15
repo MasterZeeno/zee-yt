@@ -9,7 +9,6 @@ ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 TEMPORARY_DIR="$MODDIR/tmp"
-VERSION_FILE="$MODDIR/CURRENT_VERSION"
 TAG_NAME=$(date +'%Y%m%d')
 HAS_RELEASE_FILE=false
 LATEST_VERSION=
@@ -250,6 +249,7 @@ edit_json() {
 
 update() {
     REPO_TYPE="${1:-monet}-og"
+    VERSION_FILE="$MODDIR/versions/$REPO_TYPE"
     ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
