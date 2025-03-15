@@ -1,6 +1,7 @@
 #!/bin/sh
 
-MODDIR=${0%/*}
+MODDIR="${MODDIR:-${0%/*}}"
+
 SITE="https://raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
