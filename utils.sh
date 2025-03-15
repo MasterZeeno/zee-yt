@@ -12,8 +12,8 @@ TEMPORARY_DIR="$MODDIR/tmp"
 # REPO=
 # MATRIX=
 # TAG_NAME=
-JSON_FILE=
-RELEASE_FILE=
+# JSON_FILE=
+# RELEASE_FILE=
 JSON_DATA=
 ORIG_JSON_URL=
 LATEST_VERSION=
@@ -264,4 +264,10 @@ update() {
         edit_module
         edit_json
     fi
+}
+
+test() {
+    echo "AUTHOR: $AUTHOR"
+    echo "REPO: $REPO"
+    echo "TAGNAME: $TAGNAME"
 }
