@@ -18,7 +18,7 @@ jobs:
 
       - name: Set Environment Variables
         run: |
-          AUTHOR=${{ github.owner }}
+          AUTHOR=${{ github.repository_owner }}
           REPO=$(basename "${{ github.repository }}")
           echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
           echo "TAG_NAME=$(date +'%Y%m%d')" >> $GITHUB_ENV
