@@ -55,3 +55,6 @@ jobs:
           body: "Automatically generated release for YouTube (${{ matrix.type }}-og)."
           draft: false
           prerelease: false
+          
+      - name: Delay
+        run: sleep 5
