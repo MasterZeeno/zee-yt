@@ -2,15 +2,15 @@ name: Update
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Runs daily at 12 AM UTC
-  workflow_dispatch:  # Allows manual triggering
+    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   run-zee-and-release:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        type: [monet, black]  # Creates two jobs: one for monet, one for black
+        type: [monet, black]
 
     steps:
       - name: Checkout Repository
@@ -33,13 +33,20 @@ jobs:
 
       - name: Verify Release File
         run: |
-          if [ ! -f "${{ env.RELEASE_FILE }}" ]; then
-            echo "Error: Release file not found!"
-            exit 1
+          if [ -f "${{ env.RELEASE_FILE }}" ]; then
+            echo "TO_UPDATE=true" >> $GITHUB_ENV
+          else
+            echo "TO_UPDATE=false" >> $GITHUB_ENV
           fi
           
+      - name: Updated
+        if: ${{ env.TO_UPDATE == 'false' }}
+        run: |
+          echo "You're using the latest version."
+          exit 0
+          
       - name: Create GitHub Release
-        if: success()
+        if: ${{ env.TO_UPDATE == 'true' }}
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.RELEASE_FILE }}
@@ -54,9 +61,8 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git pull
+          git pull --rebase
           git add "${{ env.JSON_FILE }}"
           git commit -m "Auto-update YouTube (${{ matrix.type }}-og)"
           git push origin main
-
           
