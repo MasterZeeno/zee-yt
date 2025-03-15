@@ -35,16 +35,7 @@ jobs:
             echo "Error: Release file not found!"
             exit 1
           fi
-
-      - name: Commit and Push Changes
-        if: success()
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add "${{ env.VERSION_FILE }}" "${{ env.JSON_FILE }}"
-          git commit -m "Auto-update YouTube (${{ matrix.type }}-og)"
-          git push origin main
-
+          
       - name: Create GitHub Release
         if: success()
         uses: softprops/action-gh-release@v2
@@ -55,6 +46,14 @@ jobs:
           body: "Automatically generated release for YouTube (${{ matrix.type }}-og)."
           draft: false
           prerelease: false
+
+      - name: Commit and Push Changes
+        if: success()
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add "${{ env.VERSION_FILE }}" "${{ env.JSON_FILE }}"
+          git commit -m "Auto-update YouTube (${{ matrix.type }}-og)"
+          git push origin main
+
           
-      - name: Delay
-        run: sleep 5
