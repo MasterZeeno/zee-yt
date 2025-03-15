@@ -18,11 +18,11 @@ jobs:
 
       - name: Set Environment Variables
         run: |
+          REPO=$(basename "${{ github.repository }}")
           echo "TAG_NAME=$(date +'%Y%m%d')" >> $GITHUB_ENV
           echo "VERSION_FILE=CURRENT_VERSION" >> $GITHUB_ENV
-          echo "REPO=$(basename '${{ github.repository }}')" >> $GITHUB_ENV
-          echo "JSON_FILE=${{ env.REPO }}/${{ matrix.type }}-og.json" >> $GITHUB_ENV
-          echo "RELEASE_FILE=${{ env.REPO }}-${{ matrix.type }}-og.zip" >> $GITHUB_ENV
+          echo "JSON_FILE=${REPO}/${{ matrix.type }}-og.json" >> $GITHUB_ENV
+          echo "RELEASE_FILE=${REPO}-${{ matrix.type }}-og.zip" >> $GITHUB_ENV
 
       - name: Run Zee Script
         run: |
