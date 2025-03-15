@@ -10,7 +10,7 @@ TEMPORARY_DIR="$MODDIR/tmp"
 
 AUTHOR=
 REPO=
-REPO_TYPE=
+MATRIX=
 JSON_FILE=
 RELEASE_FILE=
 JSON_DATA=
@@ -202,7 +202,7 @@ edit_module() {
             CONTENTS=$(cat "$MOD_PROP")
             for item in "id=$REPO" "name=$AUTHOR YouTube Lite" \
                        "author=$AUTHOR" "description=$AUTHOR YouTube Lite Magisk Module" \
-                       "updateJson=$SITE/$AUTHOR/$REPO/main/$REPO/${REPO_TYPE}.json"; do
+                       "updateJson=$SITE/$AUTHOR/$REPO/main/$REPO/${MATRIX}.json"; do
                 search="${item%=*}"
                 replace="${item##*=}"
                 if ! echo "$CONTENTS" | grep -qF "$item"; then
@@ -216,7 +216,7 @@ edit_module() {
         fi
         
         cd "$TEMPORARY_DIR"
-        zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${REPO_TYPE}.zip."; return 1; }
+        zip -r "$RELEASE_FILE" . || { show_msg "Error: Unable to create ${MATRIX}.zip."; return 1; }
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
         rm -rf "$TEMPORARY_DIR"
@@ -246,14 +246,14 @@ edit_json() {
 }
 
 update() {
-    AUTHOR="${1:-MasterZeeno}"
-    REPO="${2:-zee-yt}"
-    REPO_TYPE="${3:-monet}-og"
-    TAG_NAME="${4:-$(date +%Y%m%d)}"
+    # AUTHOR="${1:-MasterZeeno}"
+    # REPO="${2:-zee-yt}"
+    # MATRIX="${3:-monet}-og"
+    # TAG_NAME="${4:-$(date +%Y%m%d)}"
     
-    ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
-    JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
-    RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+    ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${MATRIX}.json"
+    JSON_FILE="$MODDIR/$REPO/${MATRIX}.json"
+    RELEASE_FILE="${REPO}-${MATRIX}.zip"
     
     check_dependencies curl unzip jq || exit 1
     
