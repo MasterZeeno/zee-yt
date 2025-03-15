@@ -14,6 +14,10 @@ HAS_RELEASE_FILE=false
 LATEST_VERSION=
 VERSION_CODE=
 JSON_DATA=
+REPO_TYPE="${1:-monet}-og"
+ORIG_JSON_URL=
+JSON_FILE=
+RELEASE_FILE=
 
 check_dependencies() {
     missing_cmds=""
