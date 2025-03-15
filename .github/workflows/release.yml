@@ -42,8 +42,8 @@ jobs:
         with:
           files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
-          name: "Release ${{ env.TAG_NAME }} - YouTube (${{ matrix.type }}-og)"
-          body: "Automatically generated release for YouTube (${{ matrix.type }}-og)."
+          name: "Release ${{ env.TAG_NAME }}"
+          body: "Automatically generated release."
           draft: false
           prerelease: false
 
