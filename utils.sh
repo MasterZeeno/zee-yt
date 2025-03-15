@@ -254,6 +254,11 @@ update() {
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
     
+    check_dependencies curl unzip jq || exit 1
+    
+    [ -f "$VERSION_FILE" ] || update_version "0.0.0"
+    CURRENT_VERSION=$(cat "$VERSION_FILE")
+    
     if ! needs_update; then
         download_and_extract
         edit_module
