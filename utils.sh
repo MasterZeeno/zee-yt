@@ -1,22 +1,21 @@
 #!/bin/sh
 
 MODDIR=${0%/*}
-AUTHOR="MasterZeeno"
-REPO="zee-yt"
 SITE="https://raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 TEMPORARY_DIR="$MODDIR/tmp"
 TAG_NAME=$(date +'%Y%m%d')
-HAS_RELEASE_FILE=false
-LATEST_VERSION=
-VERSION_CODE=
-JSON_DATA=
-REPO_TYPE="${1:-monet}-og"
-ORIG_JSON_URL=
+AUTHOR=
+REPO=
+REPO_TYPE=
 JSON_FILE=
 RELEASE_FILE=
+JSON_DATA=
+ORIG_JSON_URL=
+LATEST_VERSION=
+VERSION_CODE=
 
 check_dependencies() {
     missing_cmds=""
@@ -219,7 +218,6 @@ edit_module() {
         cd ..
         mv -f "$TEMPORARY_DIR/$RELEASE_FILE" "$MODDIR/$RELEASE_FILE"
         rm -rf "$TEMPORARY_DIR"
-        HAS_RELEASE_FILE=true
     fi
 }
 
@@ -246,7 +244,9 @@ edit_json() {
 }
 
 update() {
-    REPO_TYPE="${1:-monet}-og"
+    AUTHOR="${1:-MasterZeeno}"
+    REPO="${2:-zee-yt}"
+    REPO_TYPE="${3:-monet}-og"
     ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
