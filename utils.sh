@@ -239,6 +239,7 @@ edit_json() {
 
     if [ $? -eq 0 ]; then
         show_msg "Success: Updated JSON file."
+        return 0
     else
         show_msg "Error: Failed to update JSON file."
         return 1
