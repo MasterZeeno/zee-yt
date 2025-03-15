@@ -248,7 +248,8 @@ update() {
     AUTHOR="${1:-MasterZeeno}"
     REPO="${2:-zee-yt}"
     REPO_TYPE="${3:-monet}-og"
-    # TAG_NAME="${4:-$(date 
+    TAG_NAME="${4:-$(date +%Y%m%d)}"
+    
     ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
