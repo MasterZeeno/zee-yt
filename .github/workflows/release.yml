@@ -39,15 +39,15 @@ jobs:
       - name: Configure sparse-checkout and Set Environment Variables
         run: |
           MATRIX="${{ matrix.type }}"
-          JSON_FILE="$REPO/${MATRIX}-og.json"
-          RELEASE_FILE="$REPO-${MATRIX}-og.zip"
+          JSON_FILE="./$REPO/${MATRIX}-og.json"
+          RELEASE_FILE="./$REPO-${MATRIX}-og.zip"
 
           echo "MATRIX=${MATRIX}" >> "$GITHUB_ENV"
           echo "JSON_FILE=${JSON_FILE}" >> "$GITHUB_ENV"
           echo "RELEASE_FILE=${RELEASE_FILE}" >> "$GITHUB_ENV"
 
-          git sparse-checkout init --cone
-          git sparse-checkout set "$JSON_FILE" "utils.sh" "zee.sh"
+          git sparse-checkout init --no-cone
+          git sparse-checkout set "$JSON_FILE" "*.sh"
           git read-tree -mu HEAD
 
       - name: Run Zee Script
