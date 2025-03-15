@@ -38,9 +38,13 @@ jobs:
 
       - name: Configure sparse-checkout and Set Environment Variables
         run: |
-          export MATRIX="${{ matrix.type }}"
-          export JSON_FILE="./$REPO/${MATRIX}-og.json"
-          export RELEASE_FILE="./$REPO-${MATRIX}-og.zip"
+          MATRIX="${{ matrix.type }}"
+          JSON_FILE="./$REPO/${MATRIX}-og.json"
+          RELEASE_FILE="./$REPO-${MATRIX}-og.zip"
+
+          echo "MATRIX=$MATRIX" >> "$GITHUB_ENV"
+          echo "JSON_FILE=$JSON_FILE" >> "$GITHUB_ENV"
+          echo "RELEASE_FILE=$RELEASE_FILE" >> "$GITHUB_ENV"
 
           git sparse-checkout init --cone
           git sparse-checkout set "$JSON_FILE" "*.sh"
@@ -49,37 +53,37 @@ jobs:
       - name: Run Zee Script
         run: |
           chmod +x zee.sh
-          ./zee.sh "$AUTHOR" "$REPO" "$MATRIX" "$TAGNAME"
+          ./zee.sh
 
       - name: Verify Release File
         run: |
           if [ -f "$RELEASE_FILE" ]; then
-            export TO_UPDATE=true
+            echo "TO_UPDATE=true" >> "$GITHUB_ENV"
           else
-            export TO_UPDATE=false
+            echo "TO_UPDATE=false" >> "$GITHUB_ENV"
           fi
 
       - name: Updated
-        if: env.TO_UPDATE == 'false'
+        if: ${{ env.TO_UPDATE == 'false' }}
         run: echo "You're using the latest version."
 
       - name: Create GitHub Release
-        if: env.TO_UPDATE == 'true'
+        if: ${{ env.TO_UPDATE == 'true' }}
         uses: softprops/action-gh-release@v2
         with:
-          files: "$RELEASE_FILE"
-          tag_name: "$TAGNAME"
-          name: "$REPO - $TAGNAME"
-          body: "$AUTHOR YouTube Lite Magisk Module."
+          files: "${{ env.RELEASE_FILE }}"
+          tag_name: "${{ env.TAGNAME }}"
+          name: "${{ env.REPO }} - ${{ env.TAGNAME }}"
+          body: "${{ env.AUTHOR }} YouTube Lite Magisk Module."
           draft: false
           prerelease: false
 
       - name: Commit and Push Changes
-        if: env.TO_UPDATE == 'true'
+        if: ${{ env.TO_UPDATE == 'true' }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git pull
-          git add "$JSON_FILE"
-          git commit -m "Auto-update YouTube (${MATRIX}-og)"
+          git add "${{ env.JSON_FILE }}"
+          git commit -m "Auto-update YouTube (${{ env.MATRIX }}-og)"
           git push origin main
