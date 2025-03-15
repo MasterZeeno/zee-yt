@@ -68,11 +68,6 @@ prepend_v() {
     esac
 }
 
-update_version() {
-    content=$(prepend_v "$1")
-    echo "$content" > "$VERSION_FILE"
-}
-
 get_field() {
     FIELD="${2:-1}"
     echo "$1" | grep -oE '[0-9]+' | awk "NR==$FIELD"
@@ -240,7 +235,6 @@ edit_json() {
 
     if [ $? -eq 0 ]; then
         show_msg "Success: Updated JSON file."
-        update_version "$LATEST_VERSION"
     else
         show_msg "Error: Failed to update JSON file."
         return 1
@@ -256,8 +250,8 @@ update() {
     
     check_dependencies curl unzip jq || exit 1
     
-    [ -f "$VERSION_FILE" ] || update_version "0.0.0"
-    CURRENT_VERSION=$(cat "$VERSION_FILE")
+    [ -f "$VERSION_FILE" ] || exit 1
+    CURRENT_VERSION=$(prepend_v "$(jq -r '.version' "$VERSION_FILE")")
     
     if ! needs_update; then
         download_and_extract
