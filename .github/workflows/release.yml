@@ -19,6 +19,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           REPO=$(basename "${{ github.repository }}")
+          echo "REPO=${REPO}" >> $GITHUB_ENV
           echo "TAG_NAME=$(date +'%Y%m%d')" >> $GITHUB_ENV
           echo "VERSION_FILE=./versions/${{ matrix.type }}-og" >> $GITHUB_ENV
           echo "JSON_FILE=./${REPO}/${{ matrix.type }}-og.json" >> $GITHUB_ENV
@@ -42,7 +43,7 @@ jobs:
         with:
           files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
-          name: "Release ${{ env.TAG_NAME }}"
+          name: "${{ env.REPO }}.apk"
           body: "Automatically generated release."
           draft: false
           prerelease: false
