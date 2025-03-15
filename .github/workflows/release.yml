@@ -13,58 +13,51 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set Environment Variables
+        run: |
+          echo "TAG_NAME=$(date +'%Y%m%d')" >> $GITHUB_ENV
+          echo "VERSION_FILE=CURRENT_VERSION" >> $GITHUB_ENV
+          echo "REPO=$(basename '${{ github.repository }}')" >> $GITHUB_ENV
+
+      - name: Find JSON Files
+        run: |
+          JSON_FILES=""
+          for type in monet black; do
+            JSON_FILE="${{ env.REPO }}/${type}-og.json"
+            [ -f "$JSON_FILE" ] && JSON_FILES="$JSON_FILES $JSON_FILE"
+          done
+          echo "JSON_FILES=\"$JSON_FILES\"" >> $GITHUB_ENV
+
       - name: Run Zee Script
         run: |
-          for zee in "TAG_NAME=$(date +'%Y%m%d')" \
-            "VERSION_FILE=CURRENT_VERSION" \
-            "REPO=$(basename ${{ github.repository }})"; do
-                echo "$zee" >> $GITHUB_ENV
-          done
-          
-          JSON_FILES=
-          
-          for type in monet black; do
-            JSON_FILE="$REPO/${type}-og.json"
-            if [ -f "$JSON_FILE" ]; then
-                JSON_FILES="$JSON_FILES $JSON_FILE"
-            fi
-          done
-          
-          echo "JSON_FILES=${JSON_FILES}" >> $GITHUB_ENV
-          
           chmod +x zee.sh
           ./zee.sh
-          
-      - name: Verify File for Release
+
+      - name: Verify Release Files
         run: |
-          RELEASE_FILES=
-          
+          RELEASE_FILES=""
           for type in monet black; do
-            RELEASE_FILE="$REPO-${type}-og.zip"
-            if [ -f "$RELEASE_FILE" ]; then
-                RELEASE_FILES="$RELEASE_FILES $RELEASE_FILE"
-            fi
+            RELEASE_FILE="${{ env.REPO }}-${type}-og.zip"
+            [ -f "$RELEASE_FILE" ] && RELEASE_FILES="$RELEASE_FILES $RELEASE_FILE"
           done
-          
-          echo "RELEASE_FILES=${RELEASE_FILES}" >> $GITHUB_ENV
-      
+          echo "RELEASE_FILES=\"$RELEASE_FILES\"" >> $GITHUB_ENV
+
       - name: Commit and Push Changes
         if: env.RELEASE_FILES != ''
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILES }}
+          git add "${{ env.VERSION_FILE }}" ${{ env.JSON_FILES }}
           git commit -m "Auto-update"
           git push origin main
-          
+
       - name: Create GitHub Release
         if: env.RELEASE_FILES != ''
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.RELEASE_FILES }}
           tag_name: ${{ env.TAG_NAME }}
-          name: ${{ env.RELEASE_FILE }}
+          name: "Release ${{ env.TAG_NAME }}"
           body: "Automatically generated release from GitHub Actions."
           draft: false
           prerelease: false
-          
