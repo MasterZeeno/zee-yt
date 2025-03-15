@@ -243,15 +243,13 @@ edit_json() {
 
 update() {
     REPO_TYPE="${1:-monet}-og"
-    VERSION_FILE="$MODDIR/versions/$REPO_TYPE"
     ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
     
     check_dependencies curl unzip jq || exit 1
     
-    [ -f "$VERSION_FILE" ] || exit 1
-    CURRENT_VERSION=$(prepend_v "$(jq -r '.version' "$VERSION_FILE")")
+    CURRENT_VERSION=$(prepend_v "$(jq -r '.version' "$JSON_FILE")")
     
     if ! needs_update; then
         download_and_extract
