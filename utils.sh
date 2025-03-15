@@ -1,9 +1,8 @@
 #!/bin/sh
 
 MODDIR=${0%/*}
-AUTHOR='MasterZeeno'
-ALIAS="zee"
-REPO="${ALIAS}-yt"
+AUTHOR="MasterZeeno"
+REPO="zee-yt"
 SITE="https://raw.githubusercontent.com"
 ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
@@ -150,7 +149,7 @@ edit_module() {
         MOD_PROP="$TEMPORARY_DIR/module.prop"
         CONFIG_FILE="$TEMPORARY_DIR/config"
         
-        PATH_NAME="$(toupper "$ALIAS")PATH"
+        PATH_NAME="$(toupper "${REPO%-*}")PATH"
         TO_MATCH='VERSION='
         TO_APPEND='VERSION=$(PREPEND_V "$VERSION")'
         TO_DELETE='Join t.me'
@@ -168,8 +167,8 @@ edit_module() {
                 NEW_CONTENTS=$(echo "$CONTENTS" | sed -e "/.*${TO_DELETE}.*/d" \
                                                       -e "s|rvhc|$REPO|g" \
                                                       -e "s|${APK_PATH}|${NEW_APK_PATH}|g" \
-                                                      -e "s|/data/adb/.*.apk|/data/adb/$REPO/${ALIAS}.apk|g" \
-                                                      -e "s|RVPATH=.*|$PATH_NAME=/data/adb/$REPO/${ALIAS}.apk|g" \
+                                                      -e "s|/data/adb/.*.apk|/data/adb/$REPO/${REPO}.apk|g" \
+                                                      -e "s|RVPATH=.*|$PATH_NAME=/data/adb/$REPO/${REPO}.apk|g" \
                                                       -e "s|RVPATH|$PATH_NAME|g")
         
                 if [ "$NEW_CONTENTS" != "$CONTENTS" ]; then
@@ -201,7 +200,7 @@ edit_module() {
         if [ -s "$MOD_PROP" ]; then
             CONTENTS=$(cat "$MOD_PROP")
             for item in "id=$REPO" "name=$AUTHOR YouTube Lite" \
-                       "author=$AUTHOR" "description=$AUTHOR YouTube Lite Magisk module" \
+                       "author=$AUTHOR" "description=$AUTHOR YouTube Lite Magisk Module" \
                        "updateJson=$SITE/$AUTHOR/$REPO/main/$REPO/${REPO_TYPE}.json"; do
                 search="${item%=*}"
                 replace="${item##*=}"
