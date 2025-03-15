@@ -21,12 +21,12 @@ jobs:
 
       - name: Find JSON Files
         run: |
-          JSON_FILES=""
+          JSON_FILES=()
           for type in monet black; do
-            JSON_FILE="${{ env.REPO }}/${type}-og.json"
-            [ -f "$JSON_FILE" ] && JSON_FILES="$JSON_FILES $JSON_FILE"
+            JSON_FILE="./${{ env.REPO }}/${type}-og.json"
+            [ -f "$JSON_FILE" ] && JSON_FILES+=("$JSON_FILE")
           done
-          echo "JSON_FILES=\"$JSON_FILES\"" >> $GITHUB_ENV
+          echo "JSON_FILES=${JSON_FILES[@]}" >> $GITHUB_ENV
 
       - name: Run Zee Script
         run: |
@@ -35,19 +35,19 @@ jobs:
 
       - name: Verify Release Files
         run: |
-          RELEASE_FILES=""
+          RELEASE_FILES=()
           for type in monet black; do
-            RELEASE_FILE="${{ env.REPO }}-${type}-og.zip"
-            [ -f "$RELEASE_FILE" ] && RELEASE_FILES="$RELEASE_FILES $RELEASE_FILE"
+            RELEASE_FILE="./${{ env.REPO }}-${type}-og.zip"
+            [ -f "$RELEASE_FILE" ] && RELEASE_FILES+=("$RELEASE_FILE")
           done
-          echo "RELEASE_FILES=\"$RELEASE_FILES\"" >> $GITHUB_ENV
+          echo "RELEASE_FILES=${RELEASE_FILES[@]}" >> $GITHUB_ENV
 
       - name: Commit and Push Changes
         if: env.RELEASE_FILES != ''
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add "${{ env.VERSION_FILE }}" ${{ env.JSON_FILES }}
+          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILES }}
           git commit -m "Auto-update"
           git push origin main
 
