@@ -47,7 +47,7 @@ jobs:
           echo "RELEASE_FILE=${RELEASE_FILE}" >> "$GITHUB_ENV"
 
           git sparse-checkout init --cone
-          git sparse-checkout set "$JSON_FILE" "*.sh"
+          git sparse-checkout set "$JSON_FILE" "utils.sh" "zee.sh"
           git read-tree -mu HEAD
 
       - name: Run Zee Script
