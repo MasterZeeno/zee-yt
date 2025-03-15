@@ -249,7 +249,7 @@ update() {
     
     check_dependencies curl unzip jq || exit 1
     
-    CURRENT_VERSION=$(prepend_v "$(jq -r '.version' "$JSON_FILE")")
+    CURRENT_VERSION=$(jq -r '.version' "$JSON_FILE")
     
     if ! needs_update; then
         download_and_extract
