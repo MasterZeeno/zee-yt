@@ -6,7 +6,7 @@ ORIG_AUTHOR="selfmusing"
 ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 TEMPORARY_DIR="$MODDIR/tmp"
-TAG_NAME=$(date +'%Y%m%d')
+
 AUTHOR=
 REPO=
 REPO_TYPE=
@@ -16,6 +16,7 @@ JSON_DATA=
 ORIG_JSON_URL=
 LATEST_VERSION=
 VERSION_CODE=
+TAG_NAME=
 
 check_dependencies() {
     missing_cmds=""
@@ -247,6 +248,7 @@ update() {
     AUTHOR="${1:-MasterZeeno}"
     REPO="${2:-zee-yt}"
     REPO_TYPE="${3:-monet}-og"
+    # TAG_NAME="${4:-$(date 
     ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
     JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
     RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
