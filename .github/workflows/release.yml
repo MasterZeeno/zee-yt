@@ -44,7 +44,7 @@ jobs:
         with:
           files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
-          name: $(cat "${{ env.VERSION_FILE }}")
+          name: "${{ env.REPO }} - ${{ env.TAG_NAME }}"
           body: "${{ env.AUTHOR }} YouTube Lite Magisk Module."
           draft: false
           prerelease: false
