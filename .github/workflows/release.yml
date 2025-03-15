@@ -17,36 +17,51 @@ jobs:
         run: |
           for zee in "TAG_NAME=$(date +'%Y%m%d')" \
             "VERSION_FILE=CURRENT_VERSION" \
-            "JSON_FILE=$(basename ${{ github.repository }})/monet-og.json" \
-            "RELEASE_FILE=$(basename ${{ github.repository }})-monet-og.zip"; do
+            "REPO=$(basename ${{ github.repository }})"; do
                 echo "$zee" >> $GITHUB_ENV
           done
+          
+          JSON_FILES=
+          
+          for type in monet black; do
+            JSON_FILE="$REPO/${type}-og.json"
+            if [ -f "$JSON_FILE" ]; then
+                JSON_FILES="$JSON_FILES $JSON_FILE"
+            fi
+          done
+          
+          echo "JSON_FILES=${JSON_FILES}" >> $GITHUB_ENV
           
           chmod +x zee.sh
           ./zee.sh
           
       - name: Verify File for Release
         run: |
-          if [ -f "${{ env.RELEASE_FILE }}" ]; then
-            echo "HAS_RELEASE_FILE=true" >> $GITHUB_ENV
-          else
-            echo "HAS_RELEASE_FILE=false" >> $GITHUB_ENV
-          fi
+          RELEASE_FILES=
+          
+          for type in monet black; do
+            RELEASE_FILE="$REPO-${type}-og.zip"
+            if [ -f "$RELEASE_FILE" ]; then
+                RELEASE_FILES="$RELEASE_FILES $RELEASE_FILE"
+            fi
+          done
+          
+          echo "RELEASE_FILES=${RELEASE_FILES}" >> $GITHUB_ENV
       
       - name: Commit and Push Changes
-        if: env.HAS_RELEASE_FILE == 'true'
+        if: env.RELEASE_FILES != ''
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILE}}
+          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILES }}
           git commit -m "Auto-update"
           git push origin main
           
       - name: Create GitHub Release
-        if: env.HAS_RELEASE_FILE == 'true'
+        if: env.RELEASE_FILES != ''
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.RELEASE_FILE }}
+          files: ${{ env.RELEASE_FILES }}
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.RELEASE_FILE }}
           body: "Automatically generated release from GitHub Actions."
