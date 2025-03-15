@@ -249,6 +249,11 @@ edit_json() {
 }
 
 update() {
+    REPO_TYPE="${1:-monet}-og"
+    ORIG_JSON_URL="$SITE/$ORIG_AUTHOR/$ORIG_REPO/main/$ORIG_REPO_ID/${REPO_TYPE}.json"
+    JSON_FILE="$MODDIR/$REPO/${REPO_TYPE}.json"
+    RELEASE_FILE="${REPO}-${REPO_TYPE}.zip"
+    
     if ! needs_update; then
         download_and_extract
         edit_module

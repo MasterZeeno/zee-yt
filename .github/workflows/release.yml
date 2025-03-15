@@ -8,6 +8,9 @@ on:
 jobs:
   run-zee-and-release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        type: [monet, black]  # Creates two jobs: one for monet, one for black
 
     steps:
       - name: Checkout Repository
@@ -18,46 +21,37 @@ jobs:
           echo "TAG_NAME=$(date +'%Y%m%d')" >> $GITHUB_ENV
           echo "VERSION_FILE=CURRENT_VERSION" >> $GITHUB_ENV
           echo "REPO=$(basename '${{ github.repository }}')" >> $GITHUB_ENV
-
-      - name: Find JSON Files
-        run: |
-          JSON_FILES=()
-          for type in monet black; do
-            JSON_FILE="./${{ env.REPO }}/${type}-og.json"
-            [ -f "$JSON_FILE" ] && JSON_FILES+=("$JSON_FILE")
-          done
-          echo "JSON_FILES=${JSON_FILES[@]}" >> $GITHUB_ENV
+          echo "JSON_FILE=${{ env.REPO }}/${{ matrix.type }}-og.json" >> $GITHUB_ENV
+          echo "RELEASE_FILE=${{ env.REPO }}-${{ matrix.type }}-og.zip" >> $GITHUB_ENV
 
       - name: Run Zee Script
         run: |
           chmod +x zee.sh
-          ./zee.sh
+          ./zee.sh "${{ matrix.type }}"
 
-      - name: Verify Release Files
+      - name: Verify Release File
         run: |
-          RELEASE_FILES=()
-          for type in monet black; do
-            RELEASE_FILE="./${{ env.REPO }}-${type}-og.zip"
-            [ -f "$RELEASE_FILE" ] && RELEASE_FILES+=("$RELEASE_FILE")
-          done
-          echo "RELEASE_FILES=${RELEASE_FILES[@]}" >> $GITHUB_ENV
+          if [ ! -f "${{ env.RELEASE_FILE }}" ]; then
+            echo "Error: Release file not found!"
+            exit 1
+          fi
 
       - name: Commit and Push Changes
-        if: env.RELEASE_FILES != ''
+        if: success()
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add ${{ env.VERSION_FILE }} ${{ env.JSON_FILES }}
-          git commit -m "Auto-update"
+          git add "${{ env.VERSION_FILE }}" "${{ env.JSON_FILE }}"
+          git commit -m "Auto-update YouTube (${{ matrix.type }}-og)"
           git push origin main
 
       - name: Create GitHub Release
-        if: env.RELEASE_FILES != ''
+        if: success()
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.RELEASE_FILES }}
+          files: ${{ env.RELEASE_FILE }}
           tag_name: ${{ env.TAG_NAME }}
-          name: "Release ${{ env.TAG_NAME }}"
-          body: "Automatically generated release from GitHub Actions."
+          name: "Release ${{ env.TAG_NAME }} - YouTube (${{ matrix.type }}-og)"
+          body: "Automatically generated release for YouTube (${{ matrix.type }}-og)."
           draft: false
           prerelease: false
