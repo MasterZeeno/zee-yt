@@ -8,16 +8,16 @@ ORIG_REPO="RVX-Lite-Modules"
 ORIG_REPO_ID="rvx-yt"
 TEMPORARY_DIR="$MODDIR/tmp"
 
-AUTHOR=
-REPO=
-MATRIX=
+# AUTHOR=
+# REPO=
+# MATRIX=
+# TAG_NAME=
 JSON_FILE=
 RELEASE_FILE=
 JSON_DATA=
 ORIG_JSON_URL=
 LATEST_VERSION=
 VERSION_CODE=
-TAG_NAME=
 
 check_dependencies() {
     missing_cmds=""
